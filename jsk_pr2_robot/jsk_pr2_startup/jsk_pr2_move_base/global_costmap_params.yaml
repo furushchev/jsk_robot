@@ -3,6 +3,8 @@ plugins:
   - {name: inflation,  type: "costmap_2d::InflationLayer" }
   - {name: static_map, type: "costmap_2d::StaticLayer" }
 
+footprint: [[-0.325, -0.325], [-0.425, -0.175], [-0.425, 0.175], [-0.325, 0.325], [0.325, 0.325], [0.375, 0.0], [0.325, -0.325]]
+
 # copied from pr2_navigation_global/config/global_costmap_params.yaml
 global_frame: map
 robot_base_frame: base_footprint

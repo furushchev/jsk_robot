@@ -1,10 +1,8 @@
 plugins:
-#  - {name: footprint,  type: "costmap_2d::FootprintLayer" }
-#  - {name: inflation,  type: "costmap_2d::InflationLayer" }
-#  - {name: static_map, type: "costmap_2d::StaticLayer" }
+  - {name: inflation,  type: "costmap_2d::InflationLayer" }
   - {name: obstacles,  type: "costmap_2d::VoxelLayer" }
   - {name: people,     type: "social_navigation_layers::ProxemicLayer" }
-#  - {name: passing,    type: "social_navigation_layers::PassingLayer" }
+  - {name: passing,    type: "social_navigation_layers::PassingLayer" }
 
 obstacles:
   observation_sources: base_scan_marking base_scan tilt_scan ground_object_cloud # people_substruct_cloud
@@ -36,8 +34,8 @@ robot_base_frame: base_footprint
 # publish_frequency: 2.0
 static_map: false
 rolling_window: true
-width: 4.0 # 6.0
-height: 4.0 # 6.0
-resolution: 0.06 # 0.025
+width: 6.0 # 3.0
+height: 6.0 # 3.0
+resolution: 0.025 # 0.06
 origin_x: 0.0
 origin_y: 0.0
