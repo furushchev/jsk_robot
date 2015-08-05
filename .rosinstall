@@ -23,3 +23,8 @@
 - git:
     uri: https://github.com/tork-a/rwt_ros.git
     local-name: rwt_ros
+# naoqi_bridge_msgs: wait for release
+- git:
+    local-name: naoqi_bridge_msgs
+    uri: https://github.com/ros-naoqi/naoqi_bridge_msgs.git
+    version: master

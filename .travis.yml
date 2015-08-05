@@ -6,7 +6,7 @@ python:
 compiler:
   - gcc
 env:
-  - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=true
+  - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=true INSTALL_SRC="https://github.com/ros-naoqi/naoqi_bridge_msgs.git"
   - ROS_DISTRO=hydro  ROSWS=wstool BUILDER=catkin    USE_DEB=false NOT_TEST_INSTALL=true EXTRA_DEB="ros-hydro-convex-decomposition ros-hydro-ivcon"
   - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=true
   - ROS_DISTRO=indigo  ROSWS=wstool BUILDER=catkin   USE_DEB=false NOT_TEST_INSTALL=true EXTRA_DEB="ros-indigo-convex-decomposition ros-indigo-ivcon"

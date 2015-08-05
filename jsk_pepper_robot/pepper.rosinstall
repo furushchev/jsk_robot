@@ -2,4 +2,7 @@
     local-name: jsk_robot
     uri: http://github.com/jsk-ros-pkg/jsk_robot.git
     version: master
-
+- git:
+    local-name: naoqi_bridge_msgs
+    uri: https://github.com/ros-naoqi/naoqi_bridge_msgs.git
+    version: master
