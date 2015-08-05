@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(peppereus)
 
-find_package(catkin REQUIRED COMPONENTS diagnostic_aggregator pepper_bringup pr2eus pepper_description euscollada rostest)
+find_package(catkin REQUIRED COMPONENTS diagnostic_aggregator pepper_bringup naoqi_bridge_msgs pr2eus pepper_description euscollada rostest)
 
 catkin_package(
   CATKIN_DEPENDS diagnostic_aggregator pepper_bringup pr2eus pepper_description

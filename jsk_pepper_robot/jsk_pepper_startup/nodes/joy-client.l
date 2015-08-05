@@ -18,7 +18,7 @@
   (ros::publish "/pepper_tweet" (instance std_msgs::String :init :data (apply #'format nil str args))))
 
 
-(ros::advertise "/joint_angles" naoqi_msgs::JointAnglesWithSpeed 1)
+(ros::advertise "/joint_angles" naoqi_bridge_msgs::JointAnglesWithSpeed 1)
 
 (setq *power-button-time* (ros::time-now))
 (setq *power-button-mode* "/wakeup")
@@ -52,7 +52,7 @@
 			    ((= rb-button-state 1)
 			     (let ((up-down (elt axes 4))
 				   (left-right (elt axes 3))
-				   (ja_msg (instance naoqi_msgs::JointAnglesWithSpeed :init)))
+				   (ja_msg (instance naoqi_bridge_msgs::JointAnglesWithSpeed :init)))
 			       (send ja_msg :header :stamp (ros::time-now))
 			       (send ja_msg :header :seq 1)
 			       (send ja_msg :speed 0.1)
