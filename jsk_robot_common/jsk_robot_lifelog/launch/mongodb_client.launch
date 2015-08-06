@@ -1,0 +1,32 @@
+<launch>
+  <arg name="machine" default="c2" />
+
+  <arg name="log_tf" default="true" />
+  <arg name="log_joint_states" default="true" />
+  <arg name="log_camera_rgb" default="true" />
+  <arg name="log_camera_depth" default="true" />
+  <arg name="log_people" default="true" />
+
+  <node name="mongodb_log_tf" pkg="mongodb_log" type="mongodb_log.py"
+        output="screen" respawn="true" machine="$(arg machine)"
+        args="tf" if="$(arg log_tf)"/>
+
+  <node name="mongodb_log_joint_states" pkg="mongodb_log" type="mongodb_log.py"
+        output="screen" respawn="true" machine="$(arg machine)"
+        args="joint_states" if="$(arg log_joint_states)"/>
+
+  <node name="mongodb_log_camera_rgb" pkg="mongodb_log" type="mongodb_log.py"
+        output="screen" respawn="true" machine="$(arg machine)"
+        args="-e '*/image_rect_color/compressed' -x half quater"
+        if="$(arg log_camera_rgb)"/>
+
+  <node name="mongodb_log_camera_depth" pkg="mongodb_log" type="mongodb_log.py"
+        output="screen" respawn="true" machine="$(arg machine)"
+        args="-e '*/depth_registered/points'"
+        if="$(arg log_camera_depth)"/>
+
+  <node name="mongodb_log_people" pkg="mongodb_log" type="mongodb_log.py"
+        output="screen" respawn="true" machine="$(arg machine)"
+        args="/people /face_detector/faces_cloud"
+        if="$(arg log_people)" />
+<launch>
