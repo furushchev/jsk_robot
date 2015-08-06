@@ -54,7 +54,7 @@
                               (instance std_msgs::Header :init
                                         :frame_id "eng2/7f")
                               :lifetime 300
-                              :alpha (* (/ (float count) (length robot-to-objs)) 0.8)
+                              :alpha 0.2 ;;(* (/ (float count) (length robot-to-objs)) 0.8)
                               :id (incf count)
                               :ns "object_detection")
           marker-list)
