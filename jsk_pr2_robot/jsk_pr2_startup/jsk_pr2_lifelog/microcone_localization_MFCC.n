@@ -77,7 +77,7 @@
       <Parameter name="TF_CONJ_FILENAME" type="subnet_param" value="TF_CONJ_FILENAME" description="Filename of a pre-measured transfer function for separation."/>
       <Parameter name="MIC_FILENAME" type="string" value="" description="Filename for microphone positions."/>
       <Parameter name="MIC_POS_SHIFT" type="string" value="FIX" description="Method to decide the orgin of the coordinates. FIX uses the origin in the coordinates in MIC_FILENAME, SHIFT regards the center of microphone array as the origin. [default: FIX]"/>
-      <Parameter name="FIXED_NOISE" type="bool" value="false" description="Flag to specify fixed noise sources. [default: false]"/>
+      <Parameter name="FIXED_NOISE" type="bool" value="true" description="Flag to specify fixed noise sources. [default: false]"/>
       <Parameter name="FIXED_NOISE_FILENAME" type="subnet_param" value="NOISE_FILENAME" description="Filename describing sound locations of the fixed noise sources. The specified noise sources are always separated in addition to sound sources in INPUT_SOURCES. Available only when FIXED_NOISE = true."/>
       <Parameter name="INITW_FILENAME" type="string" value="" description="Filename of an initial separation matrix. If specified, a matrix in INITW_FILENAME is used as an initial separation matrix. Otherwise, initial separation matrix is estimated from the geometrical relationship or pre-measured TF according to TF_CONJ."/>
       <Parameter name="SPEED_OF_SOUND" type="float" value="343.0" description="Speed of sound(m/s) [default: 343.0]."/>
