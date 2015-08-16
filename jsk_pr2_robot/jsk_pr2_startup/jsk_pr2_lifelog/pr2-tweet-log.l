@@ -6,8 +6,12 @@
 (ros::load-ros-manifest "jsk_demo_common")
 
 (require :mongo-client "package://roseus_mongo/euslisp/mongo-client.l")
+(require :tweet-client "package://jsk_robot_startup/lifelog/tweet_client.l")
 (defparameter *mongo-database* "jsk_robot_lifelog")
+(defparameter *mongo-collection* "pr1012")
 (defparameter *json-parse-key-function* #'string->keyword)
+(setq json::*tzoffset* -8)
+(defvar *tweet* t)
 
 (defclass log-tweet-worker
   :super propertied-object
@@ -24,11 +28,13 @@
    (if d (setq last-check-date d) last-check-date))
   (:check (&key (timeout 300))
    (setq last-check-date (now))
-   (setq check-result (funcall check-cb self)))
+   (setq check-result (funcall check-cb self))
+   check-result)
   (:tweet ()
    (let ((str (funcall tweet-cb self check-result)))
+     (setq check-result nil)
      (unless (stringp str)
-       (ros::ros-error "[~A] expected ~A is not string." name str)
+       (ros::ros-warn "[~A] expected ~A is not string. skipping" name str)
        (return-from :tweet nil))
      str))
   ) ;; end of defmethod
@@ -36,75 +42,179 @@
 
 (defclass log-tweet-manager
   :super propertied-object
-  :slots (workers))
+  :slots (workers check-start-date))
 
 (defmethod log-tweet-manager
   (:init ()
+   (push (now) check-start-date)
    (setq workers (make-hash-table)))
   (:add-worker (w)
    (let ((work-key (intern (send w :name) *keyword-package*)))
      (if (gethash work-key workers)
          (error "duplicate worker ~A" (gethash work-key workers))
          (setf (gethash work-key workers) w))))
+  (:add-workers (w-list)
+   (dolist (w w-list) (send self :add-worker w)))
   (:remove-worker (name)
    (let ((work-key (if (keywordp name) name (intern name *keyword-package*))))
      (remhash work-key workers)))
+  (:last-check ()
+   (car check-start-date))
   (:start ()
     (do-until-key
+     (let ((with-image t))
+        (ros::ros-info "check: ~A" (now))
         (dolist (k (send workers :list-keys))
           (let ((w (gethash k workers)) ret)
             (when (send w :check)
               (setq ret (send w :tweet))
               (when ret
-                (ros::publish "tweet" (instance std_msgs::String :init :data ret)))))
-          )
-      (ros::sleep)
-      ))
+                (if *tweet*
+                    (tweet-string ret :warning-time nil :with-image with-image :speek nil :image-wait 1))
+;;                    (ros::publish *tweet-topic* (instance std_msgs::String :init :data ret))
+                (warn "tweeted: ~A...~%" (subseq ret 0 100))
+                (setq with-image nil)
+                
+                ))))
+       (ros::sleep)
+      )))
+  (:latest-enough-p (m)
+   (when m
+     (ros::ros-info "now: ~A insert: ~A" (now) (cdr (assoc :inserted_at m)))
+     (< (date- (now)
+               (cdr (assoc :inserted_at m)))
+        *latest-enough-sec*)))
   ) ;; end of defmethod
 
 ;; utility functions
-(defvar *latest-enough-sec* 10.0)
+(defvar *latest-enough-sec* 20.0)
 (defun date- (dl dr)
   (- (send dl :compute-seconds)
      (send dr :compute-seconds)))
 
 (defun latest-enough-p (m)
   (when m
-      (< (date- (now)
-                (cdr (assoc :inserted_at m)))
-         *latest-enough-sec*)))
+    (< (date- (now)
+              (cdr (assoc :inserted_at m)))
+       *latest-enough-sec*)))
 
 
 (setq *manager* (instance log-tweet-manager :init))
 (send *manager* :add-worker
       (instance log-tweet-worker :init
-                :name "function_call_count"
+                :name "action_success_rate"
                 :check-cb #'(lambda (self)
                               (let* ((last-check-date (send self :last-check))
                                      (q (car (mongo::query jsk_demo_common::FunctionEvent
                                                            ;; :meta `((:inserted_at .
-                                                           ;;           ((:$gt . ,last-check-date)))
-                                                                   (:status . "start"))
+                                                           ;;          ((:$gt . ,last-check-date)))
+                                                           :meta '((:status . "start"))
                                                            :sort '((:$natural . -1))
                                                            :single t))))
-                                  (ros::ros-info "last-check: ~A" last-check-date)
-                                  (ros::ros-info "q: ~A" q)
-                                  (latest-enough-p (cdr q))))
+                                  (when (send *manager* :latest-enough-p (cdr q)) q)))
                 :tweet-cb #'(lambda (self q)
-                              (let ((same-funcs (mongo::query jsk_demo_common::FunctionEvent
-                                                              :query '((:name . (send (car q) :name))))))
-                                (format nil "この動作の成功率は~Aパーセントです。"
-                                        (* 100 (/
-                                                (count-if #'(lambda (x)
-                                                              (string= "success" (cdr (assoc :status (cdr x)))))
-                                                          same-funcs)
-                                                (count-if #'(lambda (x)
-                                                              (string= "start" (cdr (assoc :status (cdr x)))))
-                                                          same-funcs)))
-                                        )))
+                              (let* ((same-funcs (mongo::query jsk_demo_common::FunctionEvent
+                                                              :query `((:name . ,(send (car q) :name)))))
+                                     (success-rate
+                                       (/ (* 100.0 (count-if #'(lambda (x)
+                                                                 (string= "success"
+                                                                          (cdr (assoc :status (cdr x)))))
+                                                             same-funcs))
+                                          (count-if #'(lambda (x)
+                                                        (string= "start"
+                                                                 (cdr (assoc :status (cdr x)))))
+                                                    same-funcs))))
+                                (format nil "~Aします。この動作の成功率は~Aパーセント。~Aです。"
+                                        (send (car q) :name) success-rate
+                                        (cond
+                                          ((< success-rate 20.0) "ぽんこつ")
+                                          ((< success-rate 40.0) "だめだめ")
+                                          ((< success-rate 60.0) "そこそこ")
+                                          ((< success-rate 80.0) "まあまあ")
+                                          ((= success-rate 100.0) "完璧")
+                                          (t "いい感じ")
+                                          ))))
                 ))
 
-(ros::rate 0.2) ;; [Hz]
+(send *manager* :add-worker
+      (instance log-tweet-worker :init
+                :name "action_many_times_today"
+                :check-cb #'(lambda (self)
+                              (let ((q (car (mongo::query jsk_demo_common::FunctionEvent
+                                                          :meta '((:status . "start"))
+                                                          :sort '((:$natural . -1))
+                                                          :single t))))
+                                (when (send *manager* :latest-enough-p (cdr q))
+                                  (let* ((today (send (cdr (assoc :inserted_at (cdr q))) :today))
+                                         (todays-actions
+                                          (mongo::query jsk_demo_common::FunctionEvent
+                                                        :query `((:name . ,(send (car q) :name)))
+                                                        :meta `((:status . "start")
+                                                                (:inserted_at
+                                                                 . ((:$gt . ,today)))))))
+                                    (when (> (length todays-actions) 5) todays-actions)))))
+                :tweet-cb #'(lambda (self q)
+                              (format nil "え、今日はもう~A回も~Aしましたよ。。"
+                                      (length q)
+                                      (send (caar q) :name)))))
+
+(send *manager* :add-worker
+      (instance log-tweet-worker :init
+                :name "failure_complaint"
+                :check-cb #'(lambda (self)
+                              (let ((q (car (mongo::query jsk_demo_common::FunctionEvent
+                                                          :meta '((:status . "fail"))
+                                                          :sort '((:$natural . -1))
+                                                          :single t))))
+                                (when (send *manager* :latest-enough-p (cdr q))
+                                    (let* ((recent-date (send (cdr (assoc :inserted_at (cdr q)))
+                                                              :subtract (instance interval-time :make
+                                                                                  :day 3)))
+                                           (recent-failures (mongo::query jsk_demo_common::FunctionEvent
+                                                                          :query `((:name . ,(send (car q) :name)))
+                                                                          :meta `((:status . :fail)
+                                                                                  (:inserted_at
+                                                                                   . ((:$gt . ,recent-date)))))))
+                                      (ros::ros-info "recent-failures: ~A" recent-failures)
+                                      (when (> (length recent-failures) 3) q)))))
+                :tweet-cb #'(lambda (self q)
+                              (format nil "はぁ。。どうも最近、~Aがうまくいかないんですよね。。"
+                                      (send (car q) :name)))))
+
+(send *manager* :add-worker
+      (instance log-tweet-worker :init
+                :name "context_change"
+                :check-cb #'(lambda (self)
+                              (let ((querys (mongo::query jsk_demo_common::FunctionEvent
+                                                            :meta '((:status . "start"))
+                                                            :single nil
+                                                            :sort '((:$natural . -1))))
+                                    query1 query2)
+                                (setq query1 (car querys))
+                                (setq query2 (cadr querys))
+                                (ros::ros-warn "q1: ~A q2: ~A"
+                                               (send (send (car query1) :header) :context)
+                                               (send (send (car query2) :header) :context))
+                                (when (and
+                                       (not (string=
+                                             (send (send (car query1) :header) :context)
+                                             (send (send (car query2) :header) :context)))
+                                       (send *manager* :latest-enough-p (cdr query1)))
+                                  query1)))
+                :tweet-cb #'(lambda (self q)
+                              (let* ((all-results (mongo::query jsk_demo_common::FunctionEvent
+                                                                :query `((:header.context . ,(send (send (car q) :header) :context)))))
+                                     (success-results (remove-if-not #'(lambda (x)
+                                                                         (equal (cdr (assoc :status (cdr q)))
+                                                                             "success"))
+                                                                     all-results)))
+                                (format nil "~Aの成功率は~A%です。"
+                                        (send (send (car q) :header) :context)
+                                        (/ (* 100.0 (length success-results)) (length all-results)))))
+                ))
+
+
+(ros::rate 0.05) ;; [Hz]
 (send *manager* :start)
 
 
