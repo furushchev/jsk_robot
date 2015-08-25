@@ -27,10 +27,12 @@
   (:last-check (&optional d)
    (if d (setq last-check-date d) last-check-date))
   (:check (&key (timeout 300))
+   (ros::ros-info "[~A] checking..." name)
    (setq last-check-date (now))
    (setq check-result (funcall check-cb self))
    check-result)
   (:tweet ()
+   (ros::ros-info "[~A] tweeting..." name)
    (let ((str (funcall tweet-cb self check-result)))
      (setq check-result nil)
      (unless (stringp str)
@@ -62,7 +64,7 @@
    (car check-start-date))
   (:start ()
     (do-until-key
-     (let ((with-image t))
+     (let ((with-image "/kinect_head_c2/rgb/image_rect_color"))
         (ros::ros-info "check: ~A" (now))
         (dolist (k (send workers :list-keys))
           (let ((w (gethash k workers)) ret)
@@ -70,8 +72,8 @@
               (setq ret (send w :tweet))
               (when ret
                 (if *tweet*
-;;                    (tweet-string ret :warning-time nil :with-image with-image :speek nil :image-wait 1))
-                    (ros::publish *tweet-topic* (instance std_msgs::String :init :data ret)))
+                    (tweet-string ret :warning-time nil :with-image with-image :speek nil :image-wait 10))
+;;                    (ros::publish *tweet-topic* (instance std_msgs::String :init :data ret)))
                 (warn "tweeted: ~A...~%" (subseq ret 0 100))
                 (setq with-image nil)
                 ))))
