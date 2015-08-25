@@ -70,11 +70,10 @@
               (setq ret (send w :tweet))
               (when ret
                 (if *tweet*
-                    (tweet-string ret :warning-time nil :with-image with-image :speek nil :image-wait 1))
-;;                    (ros::publish *tweet-topic* (instance std_msgs::String :init :data ret))
+;;                    (tweet-string ret :warning-time nil :with-image with-image :speek nil :image-wait 1))
+                    (ros::publish *tweet-topic* (instance std_msgs::String :init :data ret)))
                 (warn "tweeted: ~A...~%" (subseq ret 0 100))
                 (setq with-image nil)
-                
                 ))))
        (ros::sleep)
       )))
@@ -123,17 +122,22 @@
                                           (count-if #'(lambda (x)
                                                         (string= "start"
                                                                  (cdr (assoc :status (cdr x)))))
-                                                    same-funcs))))
-                                (format nil "~Aします。この動作の成功率は~Aパーセント。~Aです。"
-                                        (send (car q) :name) success-rate
-                                        (cond
-                                          ((< success-rate 20.0) "ぽんこつ")
-                                          ((< success-rate 40.0) "だめだめ")
-                                          ((< success-rate 60.0) "そこそこ")
-                                          ((< success-rate 80.0) "まあまあ")
-                                          ((= success-rate 100.0) "完璧")
-                                          (t "いい感じ")
-                                          ))))
+                                                    same-funcs)))
+                                     fmt)
+                                (setq fmt (format nil "~Aします。"
+                                                  (send (car q) :name)))
+                                (setq fmt
+                                      (concatenate string fmt
+                                        (format nil "この動作の成功率は~Aパーセント。~Aです。"
+                                                success-rate
+                                                (cond
+                                                 ((< success-rate 20.0) "ぽんこつ")
+                                                 ((< success-rate 40.0) "だめだめ")
+                                                 ((< success-rate 60.0) "そこそこ")
+                                                 ((< success-rate 80.0) "まあまあ")
+                                                 ((= success-rate 100.0) "完璧")
+                                                 (t "いい感じ")))))
+                                ))
                 ))
 
 (send *manager* :add-worker
@@ -208,9 +212,10 @@
                                                                          (equal (cdr (assoc :status (cdr q)))
                                                                              "success"))
                                                                      all-results)))
-                                (format nil "~Aの成功率は~A%です。"
-                                        (send (send (car q) :header) :context)
-                                        (/ (* 100.0 (length success-results)) (length all-results)))))
+                                (when (> (length success-results) 0)
+                                  (format nil "~Aの成功率は~A%です。"
+                                          (send (send (car q) :header) :context)
+                                          (/ (* 100.0 (length success-results)) (length all-results))))))
                 ))
 
 
