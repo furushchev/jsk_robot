@@ -17,6 +17,8 @@ class DBPlay(object):
     def __init__(self):
         self.db_name = rospy.get_param('~db_name','jsk_robot_lifelog')
         self.col_name = rospy.get_param('~col_name', 'pr1012')
+        self.use_ros_time = rospy.get_param('~use_ros_time', False)
+        self.use_sim_time = rospy.get_param('use_sim_time', False)
         self.duration = rospy.get_param('~duration', 30) # days
         self.msg_store = MessageStoreProxy(database=self.db_name,
                                            collection=self.col_name)
@@ -25,17 +27,24 @@ class DBPlay(object):
         self.marker_count = 0
         
         while not rospy.is_shutdown():
-            trans = self.msg_store.query(type=TransformStamped._type,
-                                         meta_query={"inserted_at": {
-                                             "$gt": datetime.utcnow() - timedelta(days=self.duration)
-                                         }},
-                                         sort_query=[("$natural", -1)])
+            if self.use_ros_time or self.use_sim_time:
+                trans = self.msg_store.query(type=TransformStamped._type,
+                                             query={"header.stamp.sec": {
+                                                        "$gt": rospy.Time.now().secs - self.duration * 60 * 60 * 24
+                                                    }},
+                                             sort_query=[("$natural": 1)])
+            else:
+                trans = self.msg_store.query(type=TransformStamped._type,
+                                             meta_query={"inserted_at": {
+                            "$gt": datetime.utcnow() - timedelta(days=self.duration)
+                            }},
+                                             sort_query=[("$natural", 1)])
             m_arr = MarkerArray()
             m_arr.markers = V.transformStampedArrayToLabeledLineStripMarker(trans[::3], label_downsample=10, discrete=True)
             m_arr.markers = V.transformStampedArrayToLabeledArrayMarker(trans[::3], label_downsample=10, discrete=True)
             self.pub.publish(m_arr)
             rospy.sleep(1.0)
-            rospy.logdebug("publishing move_base_marker_array")
+            rospy.loginfo("publishing move_base_marker_array")
 
 
 if __name__ == '__main__':
