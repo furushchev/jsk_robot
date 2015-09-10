@@ -7,6 +7,7 @@
 
 (require :mongo-client "package://roseus_mongo/euslisp/mongo-client.l")
 (require :tweet-client "package://jsk_robot_startup/lifelog/tweet_client.l")
+(load "pr2-tweet-log-phrase.l")
 (defparameter *mongo-database* "jsk_robot_lifelog")
 (defparameter *mongo-collection* "pr1012")
 (defparameter *json-parse-key-function* #'string->keyword)
@@ -64,7 +65,7 @@
    (car check-start-date))
   (:start ()
     (do-until-key
-     (let ((with-image "/kinect_head_c2/rgb/image_rect_color"))
+     (let ((with-image t))
         (ros::ros-info "check: ~A" (now))
         (dolist (k (send workers :list-keys))
           (let ((w (gethash k workers)) ret)
@@ -126,20 +127,23 @@
                                                                  (cdr (assoc :status (cdr x)))))
                                                     same-funcs)))
                                      fmt)
-                                (setq fmt (format nil "~Aします。"
+                                (setq fmt (format nil (_ "Now I'm executing ~A.")
                                                   (send (car q) :name)))
-                                (setq fmt
-                                      (concatenate string fmt
-                                        (format nil "この動作の成功率は~Aパーセント。~Aです。"
-                                                success-rate
-                                                (cond
-                                                 ((< success-rate 20.0) "ぽんこつ")
-                                                 ((< success-rate 40.0) "だめだめ")
-                                                 ((< success-rate 60.0) "そこそこ")
-                                                 ((< success-rate 80.0) "まあまあ")
-                                                 ((= success-rate 100.0) "完璧")
-                                                 (t "いい感じ")))))
-                                ))
+                                (if same-funcs
+                                  (setq fmt
+                                        (concatenate string fmt
+                                          (format nil (_ "Success rate of this action is ~A%, ~A")
+                                                  success-rate
+                                                  (cond
+                                                   ((< success-rate 20.0) (_ "Oh, no good at all..."))
+                                                   ((< success-rate 40.0) (_ "Hmm, not good..."))
+                                                   ((< success-rate 60.0) (_ "Well, not so bad.."))
+                                                   ((< success-rate 80.0) (_ "Good!"))
+                                                   ((= success-rate 100.0) (_ "Perfect!!!"))
+                                                   (t (_ "Excellent!!"))))))
+                                  (setq fmt (concatenate string fmt
+                                             (_ "This is the first time to do."))))
+                                  ))
                 ))
 
 (send *manager* :add-worker
@@ -160,7 +164,7 @@
                                                                  . ((:$gt . ,today)))))))
                                     (when (> (length todays-actions) 5) todays-actions)))))
                 :tweet-cb #'(lambda (self q)
-                              (format nil "え、今日はもう~A回も~Aしましたよ。。"
+                              (format nil (_ "This is ~A times I do ~A today...")
                                       (length q)
                                       (send (caar q) :name)))))
 
@@ -184,7 +188,7 @@
                                       (ros::ros-info "recent-failures: ~A" recent-failures)
                                       (when (> (length recent-failures) 3) q)))))
                 :tweet-cb #'(lambda (self q)
-                              (format nil "はぁ。。どうも最近、~Aがうまくいかないんですよね。。"
+                              (format nil (_ "~A failed. Hmm, Things are not going too well recently...")
                                       (send (car q) :name)))))
 
 (send *manager* :add-worker
@@ -198,9 +202,9 @@
                                     query1 query2)
                                 (setq query1 (car querys))
                                 (setq query2 (cadr querys))
-                                (ros::ros-warn "q1: ~A q2: ~A"
-                                               (send (send (car query1) :header) :context)
-                                               (send (send (car query2) :header) :context))
+                                ;; (ros::ros-warn "q1: ~A q2: ~A"
+                                ;;                (send (send (car query1) :header) :context)
+                                ;;                (send (send (car query2) :header) :context))
                                 (when (and
                                        (not (string=
                                              (send (send (car query1) :header) :context)
@@ -215,7 +219,7 @@
                                                                              "success"))
                                                                      all-results)))
                                 (when (> (length success-results) 0)
-                                  (format nil "~Aの成功率は~A%です。"
+                                  (format nil (_ "Success rate of ~A is ~A percent.")
                                           (send (send (car q) :header) :context)
                                           (/ (* 100.0 (length success-results)) (length all-results))))))
                 ))
