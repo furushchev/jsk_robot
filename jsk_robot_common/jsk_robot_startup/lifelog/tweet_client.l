@@ -53,8 +53,8 @@
                         (t "じゅういじょう"))))
     (unix::sleep warning-time))
 
-  (when with-image
-    (unix::system (format nil "rm -f /tmp/tweet_image.jpg")))
+  ;; (when with-image
+  ;;   (unix::system (format nil "rm -f /tmp/tweet_image.jpg")))
 
   ;; camera shot sound
   (unless (ros::get-topic-publisher "robotsound_jp")
