@@ -10,6 +10,7 @@
 (setq *marker-topic* "visualize_objectdetection_marker_array")
 
 (setq json::*tzoffset* -8)
+(setq *visualize-before-days* 10)
 
 (ros::load-ros-manifest "posedetection_msgs")
 (ros::load-ros-manifest "geometry_msgs")
@@ -17,7 +18,7 @@
 (defun meta->inserted-at (meta)
   (send (cdr (assoc :inserted_at meta)) :compute-seconds))
 
-(setq start-time (send (now) :offset-day -10))
+(setq start-time (send (now) :offset-day (- *visualize-before-days*)))
 
 (setq robot-to-objs (mongo::query
                      posedetection_msgs::Object6DPose

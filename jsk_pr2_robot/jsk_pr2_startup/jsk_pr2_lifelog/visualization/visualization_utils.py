@@ -44,7 +44,8 @@ class VisualizationUtils():
             m.lifetime = rospy.Time(3000)
             m.scale.x, m.scale.y, m.scale.z = 0.02, 0.06, 0.1
             m.color = ColorRGBA(rgb[0],rgb[1],rgb[2],1.0)
-            res.append(m)
+            if dist < 0.65:
+                res.append(m)
             prev_t = t
 
         for t, t_meta in tsdata_lst[::label_downsample]:
