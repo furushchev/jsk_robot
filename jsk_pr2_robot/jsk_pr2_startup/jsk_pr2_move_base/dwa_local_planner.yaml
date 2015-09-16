@@ -1,5 +1,7 @@
 # this file is originally pr2_navigation_config/dwa_local_planner.yaml
 
+controller_frequency: 30.0
+
 acc_lim_th: 3.2
 acc_lim_x: 2.5
 acc_lim_y: 2.5
