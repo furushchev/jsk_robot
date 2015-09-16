@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find pr2_machine)/$(env ROBOT).machine" />
+
+</launch>
