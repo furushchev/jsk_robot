@@ -13,13 +13,11 @@
     <remap from="odom" to="base_odometry/odom" />
     <remap from="cmd_vel" to="navigation/cmd_vel" />
 
-    <!-- Use the dwa local planner for the PR2 -->
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <rosparam file="$(find jsk_pr2_startup)/jsk_pr2_move_base/dwa_local_planner.yaml" command="load" ns="DWAPlannerROS" />
-
     <!-- Load common configuration files -->
     <rosparam file="$(find jsk_pr2_startup)/jsk_pr2_move_base/move_base_params.yaml" command="load" />
-    <rosparam file="$(find pr2_navigation_config)/move_base/recovery_behaviors.yaml" command="load" />
+    <rosparam file="$(find jsk_pr2_startup)/jsk_pr2_move_base/dwa_local_planner.yaml" command="load" ns="DWAPlannerROS" />
+    <rosparam file="$(find jsk_pr2_startup)/jsk_pr2_move_base/recovery_behaviors.yaml" command="load" />
+    <!-- <rosparam file="$(find pr2_navigation_config)/move_base/recovery_behaviors.yaml" command="load" /> -->
 
     <!-- Load global navigation specific parameters -->
     <rosparam file="$(find jsk_pr2_startup)/jsk_pr2_move_base/costmap_common_params.yaml" command="load" ns="global_costmap" />

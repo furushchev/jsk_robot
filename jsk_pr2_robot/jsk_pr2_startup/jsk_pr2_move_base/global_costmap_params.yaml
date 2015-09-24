@@ -1,9 +1,7 @@
 plugins:
   - {name: static_map, type: "costmap_2d::StaticLayer" }
-  - {name: footprint,  type: "costmap_2d::FootprintLayer" }
-  - {name: inflation,  type: "costmap_2d::InflationLayer" }
-
-footprint: [[-0.325, -0.325], [-0.425, -0.175], [-0.425, 0.175], [-0.325, 0.325], [0.325, 0.325], [0.375, 0.0], [0.325, -0.325]]
+  - {name: obstacles,  type: "costmap_2d::VoxelLayer" }
+  - {name: global_inflation,  type: "costmap_2d::InflationLayer" }
 
 # copied from pr2_navigation_global/config/global_costmap_params.yaml
 global_frame: map
@@ -12,4 +10,3 @@ update_frequency: 5.0
 publish_frequency: 0.0
 static_map: true
 rolling_window: false
-
