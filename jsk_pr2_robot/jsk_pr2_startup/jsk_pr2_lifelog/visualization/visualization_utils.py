@@ -26,6 +26,7 @@ class VisualizationUtils():
         h.stamp = rospy.Time(0) #rospy.Time.now()
         h.frame_id = "eng2" #t_first.child_frame_id
         res = []
+        cls.marker_id = 0
 
         t_first = tsdata_lst[0][0]
         prev_t = t_first.transform.translation
@@ -67,6 +68,7 @@ class VisualizationUtils():
     @classmethod
     def transformStampedArrayToLabeledLineStripMarker(cls, tsdata_lst, fmt="%Y-%m-%d %H:%M:%S", zoffset=0.05, label_downsample=1, discrete=False):
         "[[transformStamped, meta],...] -> LineStrip / String"
+        cls.marker_id = 0
         res = []
         # make line strip
         points = []

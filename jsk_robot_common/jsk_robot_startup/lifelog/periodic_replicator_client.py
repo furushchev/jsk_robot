@@ -65,7 +65,9 @@ class PeriodicReplicatorClient(Thread):
                                collections=StringList(self.collections),
                                move_before=move_before,
                                delete_after_move=self.delete_after_move)
-        client.send_goal(goal, feedback_cb=self.feedback_cb)
+        client.send_goal(goal,
+                         active_cb=self.active_cb,
+                         feedback_cb=self.feedback_cb)
         client.wait_for_result()
 
     def feedback_cb(self, feedback):

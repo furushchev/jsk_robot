@@ -1,0 +1,17 @@
+<launch>
+
+  <param name="robot/name" value="pr1012" />
+
+  <!-- logging database -->
+  <include file="$(find jsk_robot_startup)/lifelog/mongodb.launch">
+    <arg name="use_daemon" value="true"/>
+    <arg name="port" value="27017" />
+    <arg name="repl_set_mode" value="false" />
+    <arg name="replicate" value="false" />
+  </include>
+  <node name="move_base_viz" pkg="jsk_pr2_startup" type="visualize_move_base.py" output="screen">
+    <remap from="/move_base_marker_array" to="/hoge_array" />
+    <param name="downsample" value="5"/>
+    <param name="duration" value="30" />
+  </node>
+</launch>

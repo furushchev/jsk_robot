@@ -3,9 +3,10 @@
 # Author: Yuki Furuta <furushchev@jsk.imi.i.u-tokyo.ac.jp>
 
 import rospy
+from std_msgs.msg import Header
 from mongodb_store.message_store import MessageStoreProxy
 from posedetection_msgs.msg import Object6DPose
-from visualization_msgs.msg import MarkerArray
+from visualization_msgs.msg import MarkerArray, Marker
 from geometry_msgs.msg import TransformStamped
 from datetime import datetime, timedelta
 import tf
@@ -44,9 +45,10 @@ class DBPlay(object):
                             "$gt": datetime.utcnow() - timedelta(days=self.duration)
                             }},
                                              sort_query=[("$natural", 1)])
+            if len(trans) <= 0: continue
             rospy.loginfo("found %d msgs" % len(trans))
             m_arr = MarkerArray()
-            m_arr.markers = V.transformStampedArrayToLabeledLineStripMarker(trans[::self.downsample], label_downsample=self.label_downsample, discrete=True)
+#            m_arr.markers = V.transformStampedArrayToLabeledLineStripMarker(trans[::self.downsample], label_downsample=self.label_downsample, discrete=True)
             m_arr.markers = V.transformStampedArrayToLabeledArrayMarker(trans[::self.downsample], label_downsample=self.label_downsample, discrete=True)
             self.pub.publish(m_arr)
             rospy.sleep(1.0)
@@ -54,6 +56,6 @@ class DBPlay(object):
 
 
 if __name__ == '__main__':
-    rospy.init_node('visualize_move_base')
+    rospy.init_node('visualize_move_base',log_level=rospy.DEBUG)
     o = DBPlay()
     o.run()

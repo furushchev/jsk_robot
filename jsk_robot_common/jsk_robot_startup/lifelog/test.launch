@@ -1,0 +1,8 @@
+<launch>
+  <include file="$(find jsk_robot_startup)/lifelog/mongodb.launch">
+    <arg name="db_path" value="/media/musca-3/mongodb" />
+    <arg name="port" value="27017" />
+    <arg name="use_daemon" value="true" />
+    <arg name="replicate" value="false" />
+  </include>
+</launch>
