@@ -299,6 +299,18 @@ void BaseTrajectoryActionController::update()
       joints_[i]->commanded_effort_ = error[i] * 1.0; // P_gain:1.0
     }
 
+  ROS_INFO_STREAM_THROTTLE(1.0, "desired: " <<
+                    "x: " << q[0] <<
+                    ", y: " << q[1] <<
+                    ", z: " << q[2]);
+  ROS_INFO_STREAM_THROTTLE(1.0, "actual: " <<
+                    "x: " << joints_[0]->position_ <<
+                    ", y: " << joints_[1]->position_ <<
+                    ", z: " << joints_[2]->position_);
+  ROS_INFO_STREAM_THROTTLE(1.0, "error: " <<
+                    "x: " << error[0] <<
+                    ", y: " << error[1] <<
+                    ", z: " << error[2]);
 
   // ------ Determines if the goal has failed or succeeded
 
@@ -368,7 +380,7 @@ void BaseTrajectoryActionController::update()
       {
 	joints_[j]->commanded_velocity_ *=
 	  joints_[j]->max_abs_velocity_/fabs(joints_[j]->commanded_velocity_);
-	ROS_WARN("joint(%s) violates its velocity limit.", joints_[j]->name.c_str());
+	ROS_DEBUG("joint(%s) violates its velocity limit.", joints_[j]->name.c_str());
       }
    }
 
@@ -383,8 +395,9 @@ void BaseTrajectoryActionController::update()
     vel.angular.z = joints_[2]->commanded_velocity_;
     pub_command_.publish(vel);
 
-    ROS_DEBUG("pos = %f %f %f", joints_[0]->position_,joints_[1]->position_,joints_[2]->position_);
-    ROS_DEBUG("vel = %f %f %f", vel.linear.x, vel.linear.y, vel.angular.z);
+    ROS_INFO_THROTTLE(1.0, "pos = %f %f %f", joints_[0]->position_,joints_[1]->position_,joints_[2]->position_);
+    ROS_INFO_THROTTLE(1.0, "vx: %f, vy: %f, th: %f", vx, vy, theta);
+    ROS_INFO_THROTTLE(1.0, "vel = %f %f %f", vel.linear.x, vel.linear.y, vel.angular.z);
   }
 
 }
