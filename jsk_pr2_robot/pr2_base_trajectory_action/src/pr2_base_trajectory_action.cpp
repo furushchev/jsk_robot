@@ -607,6 +607,15 @@ void BaseTrajectoryActionController::commandTrajectory(const trajectory_msgs::Jo
       }
     }
 
+    ROS_INFO_STREAM("start time: " << seg.start_time <<
+                    ", duration: " << seg.duration);
+    for (int j = 0; j < seg.splines.size(); ++j) {
+      ROS_INFO_STREAM("  spline " << j << ":");
+      for (int k = 0; k < 6; ++k)
+        ROS_INFO_STREAM("    " << k << ": " << seg.splines[j].coef[k]);
+    }
+
+
     // Pushes the splines onto the end of the new trajectory.
 
     new_traj.push_back(seg);
