@@ -5,6 +5,13 @@
 
 (load "package://fetcheus/fetch-interface.l")
 
+;; wait for gazebo
+(ros::roseus "test_fetch_moveit")
+(ros::advertise "/arm_controller/follow_joint_trajectory/goal" control_msgs::FollowJointTrajectoryActionGoal)
+(while (= (ros::get-num-subscribers "/arm_controller/follow_joint_trajectory/goal") 0)
+  (unix:sleep 1)
+  (format *error-output* "waiting for controller ... arm_controller (~A)~%" (ros::time-now)))
+
 (setq *ri* (instance fetch-interface :init))
 (setq *fetch* (fetch))
 (send *fetch* :reset-pose)
