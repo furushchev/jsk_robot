@@ -1,0 +1,14 @@
+<launch>
+  <arg name="visualize" default="true" />
+  <include file="$(find rtabmap_ros)/launch/rgbd_mapping.launch">
+    <arg name="rtabmap_args" value="--delete_db_on_start" />
+    <arg name="rviz" value="false" />
+    <arg name="rtabmapviz" value="$(arg visualize)" />
+    <arg name="frame_id" value="base_link" />
+    <arg name="rgb_topic" value="/pepper_robot/camera/front/image_rect_color" />
+    <arg name="camera_info_topic" value="/pepper_robot/camera/front/camera_info" />
+    <arg name="depth_registered_topic" value="/pepper_robot/camera/depth_registered/sw_registered/image_rect_raw" />
+    <arg name="subscribe_scan" value="true" />
+    <arg name="scan_topic" value="/pepper_robot/laser" />
+  </include>
+</launch>
