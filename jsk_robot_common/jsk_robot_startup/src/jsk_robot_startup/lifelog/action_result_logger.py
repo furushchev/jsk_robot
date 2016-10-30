@@ -20,7 +20,7 @@ from sensor_msgs.msg import JointState
 from mongodb_store.message_store import MessageStoreProxy
 
 
-class ActionResultDB(object):
+class ActionResultLogger(object):
     loaded_types = []
     useless_types = ['std_msgs/Header'] # message types not but action (goal|result)
     subscribers = {} # topicname:subscriber
@@ -76,37 +76,26 @@ class ActionResultDB(object):
         nearest_state = min(self.joint_states,key=key_func)
         self._insert_joint_states(nearest_state)
 
-    def _joint_states_cb(self, msg):
-        self.joint_states = [m for m in self.joint_states if (msg.header.stamp - m.header.stamp).to_sec() < self.joint_tolerance] + [msg]
-        self.joint_states_inserted = [s for s in self.joint_states_inserted if (msg.header.stamp - s).to_sec() < self.joint_tolerance]
-
     # insert functions
-    def _insert_action_goal(self,topic,type_name,msg):
+    def _insert_action_goal(self, topic, type_name, msg):
         try:
             res = self.msg_store.insert(msg)
             rospy.loginfo("inserted action_goal message: %s (%s) -> %s", topic, type_name, res)
         except Exception as e:
             rospy.logerr("failed to insert action goal: %s (%s) -> %s", topic, type_name, e)
 
-    def _insert_action_result(self,topic,type_name,msg):
+    def _insert_action_result(self, topic, type_name, msg):
         try:
             res = self.msg_store.insert(msg)
             rospy.loginfo("inserted action_result message: %s (%s) -> %s", topic, type_name, res)
         except Exception as e:
             rospy.logerr("failed to insert action result: %s (%s) -> %s", topic, type_name, e)
     
-
-    def _insert_joint_states(self, msg):
-        try:
-            if msg.header.stamp in self.joint_states_inserted:
-                return
-            res = self.msg_store.insert(msg)
-            rospy.loginfo("inserted joint_states message: %s", res)
-        except Exception as e:
-            rospy.logerr("failed to insert joint states: %s", e)
+    def _insert_action_feedback(self, topic, type_name, msg):
+        pass
 
     # if the message type is goal or result, return the callback
-    def _message_callback_type(self,name,type_name,type_obj):
+    def _message_callback_type(self, name, type_name, type_obj):
         if not hasattr(type_obj,'header'): return None # no header message
         if type(type_obj.header) != std_msgs.msg.Header: return None # custom header message
         if hasattr(type_obj,'goal_id') and hasattr(type_obj,'goal') and type(type_obj.goal_id) == actionlib_msgs.msg.GoalID:
@@ -170,12 +159,12 @@ class ActionResultDB(object):
                 self.useless_types += [py_topic_class]
                 rospy.logerr('error registering subscriber: %s', e)
                 continue
+    def run(self):
+        while not rospy.is_shutdown():
+            self.update_subscribers()
+            self.sleep_one_cycle()
 
 
 if __name__ == "__main__":
-    rospy.init_node('action_result_db')
-    obj = ActionResultDB()
-
-    while not rospy.is_shutdown():
-        obj.update_subscribers()
-        obj.sleep_one_cycle()
+    rospy.init_node('action_result_logger')
+    ActionResultDB().run()

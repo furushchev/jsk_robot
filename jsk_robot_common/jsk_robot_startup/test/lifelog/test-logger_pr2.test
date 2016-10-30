@@ -1,0 +1,37 @@
+<launch>
+  <machine name="localhost" address="localhost" default="true" />
+
+  <param name="robot/database" value="test_database" />
+  <param name="robot/name" value="test_collection" />
+
+  <!-- setup mongodb server -->
+  <include file="$(find roseus_mongo)/test/temp_mongodb_store.xml" />
+
+  <include file="$(find pr2_gazebo)/launch/pr2_empty_world.launch" />
+
+  <!-- startup base_trajectory_logger -->
+  <node name="base_trajectory_logger"
+        pkg="jsk_robot_startup" type="base_trajectory_logger">
+    <rosparam>
+      map_frame:    odom_combined
+      robot_frame:  base_footprint
+      update_cycle: 0.1
+    </rosparam>
+  </node>
+
+  <!-- startup action_result_logger -->
+  <node name="action_result_logger"
+        pkg="jsk_robot_startup" type="action_result_logger">
+    <rosparam>
+      white_list:
+        type:
+        - Pr2GripperCommandActionGoal
+        - Pr2GripperCommandActionResult
+    </rosparam>
+  </node>
+
+  <!-- test node -->
+  <test test-name="test_arm_trajectory_logger" pkg="roseus" type="roseus"
+        args="$(find jsk_robot_startup)/test/lifelog/test-logger-pr2.l"
+        retry="3" />
+</launch>

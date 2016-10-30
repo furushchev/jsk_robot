@@ -1,0 +1,26 @@
+<launch>
+  <!-- launch mongodb interface -->
+  <include file="$(find jsk_robot_startup)/lifelog/mongodb_local.launch" />
+
+  <node name="base_trajectory_logger"
+        pkg="jsk_robot_startup" type="base_trajectory_logger">
+    <rosparam>
+      map_frame:    eng2
+      robot_frame:  base_footprint
+      update_cycle: 0.1
+    </rosparam>
+  </node>
+
+  <node name="object_detection_logger"
+        pkg="jsk_robot_startup" type="object_detection_logger">
+    <rosparam>
+      map_frame:   eng2
+      robot_frame: base_footprint
+    </rosparam>
+  </node>
+
+  <node name="action_result_logger"
+        pkg="jsk_robot_startup" type="action_result_logger">
+    <rosparam command="load" file="$(find jsk_robot_startup)/test/action_result_logger_config.yaml" />
+  </node>
+</launch>
