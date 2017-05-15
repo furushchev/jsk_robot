@@ -1,4 +1,8 @@
 <launch>
+  <arg name="launch_runtime_logger" default="false" />
+  <arg name="launch_hd_monitor" default="false" />
+  <arg name="launch_wifi_ddwrt" default="false" />
+
   <param name="/use_sim_time" value="false"/>
   <include file="$(find pr2_machine)/pr2.machine" />
 
@@ -104,15 +108,18 @@
 
   <!-- Runtime Diagnostics and Motor Trace Logging -->
   <node name="runtime_logger" machine="c1"  pkg="rosbag" type="record"
-      args="-o /hwlog/pr2_diagnostics --split --size=200 --bz2 /diagnostics -e '/motor_trace/.*'" />
+	args="-o /hwlog/pr2_diagnostics --split --size=200 --bz2 /diagnostics -e '/motor_trace/.*'"
+	if="$(arg launch_runtime_logger)" />
 
   <!-- NTP monitoring script reports clock sync on diagnostics -->
   <node pkg="pr2_computer_monitor" name="ntp_c1" type="ntp_monitor.py" args="10.68.255.1 --offset-tolerance 50000 --diag-hostname=c1" machine="c1" />
   <node pkg="pr2_computer_monitor" name="ntp_c2" type="ntp_monitor.py" args="c1 --diag-hostname=c2" machine="c2"/>
 
   <!-- Disk usage monitoring script monitors HD temperature, usage on diagnostics -->
-  <node pkg="pr2_computer_monitor" name="realtime_hd_monitor" type="hd_monitor.py" args="$(optenv HOME /home) --diag-hostname=c1" machine="c1"/>
-  <node pkg="pr2_computer_monitor" name="two_hd_monitor" type="hd_monitor.py" args="--diag-hostname=c2" machine="c2"/>
+  <group if="$(arg launch_hd_monitor)">
+    <node pkg="pr2_computer_monitor" name="realtime_hd_monitor" type="hd_monitor.py" args="$(optenv HOME /home) --diag-hostname=c1" machine="c1"/>
+    <node pkg="pr2_computer_monitor" name="two_hd_monitor" type="hd_monitor.py" args="--diag-hostname=c2" machine="c2"/>
+  </group>
 
   <!-- Monitor CPU temp, usage -->
   <node pkg="pr2_computer_monitor" name="realtime_cpu_monitor" type="cpu_monitor.py" args="--diag-hostname=c1" machine="c1" >
@@ -124,13 +131,14 @@
   </node>
 
   <!-- Monitor Wifi/ddwrt -->
-  <node pkg="pr2_computer_monitor" name="ddwrt_diag" type="wifi_monitor.py" machine="c1" />
-  <node name="wifi_ddwrt" pkg="wifi_ddwrt" type="ddwrt.py">
-    <param name="username" type="string" value="root" />
-    <param name="password" type="string" value="willow" />
-    <param name="router" type="string" value="wifi-router" />
-   </node>
-
+  <group if="$(arg launch_wifi_ddwrt)">
+    <node pkg="pr2_computer_monitor" name="ddwrt_diag" type="wifi_monitor.py" machine="c1" />
+    <node name="wifi_ddwrt" pkg="wifi_ddwrt" type="ddwrt.py">
+      <param name="username" type="string" value="root" />
+      <param name="password" type="string" value="willow" />
+      <param name="router" type="string" value="wifi-router" />
+    </node>
+  </group>
   
   <!-- Diagnostics aggregation -->
   <node pkg="diagnostic_aggregator" type="aggregator_node"  name="diag_agg" />
