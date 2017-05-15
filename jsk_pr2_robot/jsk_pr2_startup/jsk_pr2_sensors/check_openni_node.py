@@ -2,7 +2,10 @@
 
 import sys,subprocess,traceback
 import rospy
-import cv
+try:
+    import cv2 as cv
+except:
+    import cv
 import time
 import os
 from std_srvs.srv import Empty, EmptyResponse
@@ -37,12 +40,16 @@ class CheckOpenNINode:
     def image_callback(self, msg):
         self.image_sub.unregister()
         try:
-            cv_image = self.bridge.imgmsg_to_cv(msg, "bgr8")
+            cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+            sum_of_pixels = max(cv.sumElems(cv_image)
         except CvBridgeError, e:
-            rospy.logerr("[%s] failed to convert image to cv", self.__class__.__name__)
-            return
+            try:
+                cv_image = self.bridge.imgmsg_to_cv(msg, "bgr8")
+                sum_of_pixels = max(cv.Sum(cv_image))
+            except CvBridgeError, e:
+                rospy.logerr("[%s] failed to convert image to cv", self.__class__.__name__)
+                return
 
-        sum_of_pixels = max(cv.Sum(cv_image))
         rospy.loginfo("[%s] sum of pixels is %d at %s", self.__class__.__name__, sum_of_pixels, msg.header.stamp.secs)
         if sum_of_pixels == 0:
             self.restart_openni_node()
