@@ -3,7 +3,7 @@
         name="start_launch_sound" />
   <arg name="map_frame" default="eng2" />
   <arg name="launch_map" default="true" />
-  <arg name="launch_openni" default="false" />
+  <arg name="launch_openni" default="true" />
   <arg name="launch_move_base" default="true" />
   <arg name="launch_imagesift" default="false" />
   <arg name="launch_facedetection" default="false" />
@@ -11,12 +11,12 @@
   <arg name="launch_mjpeg_server" default="false" />
   <arg name="launch_gripper_sensor" default="true" />
   <arg name="launch_safety_warning" default="true" />
-  <arg name="launch_tablet" default="true" />
-  <arg name="launch_jsk_pcl" default="true" />
+  <arg name="launch_tablet" default="false" />
+  <arg name="launch_jsk_pcl" default="false" />
   <arg name="launch_db" default="true" />
   <arg name="launch_hark" default="true" />
-  <arg name="launch_teleoperation" default="true" />
-  <arg name="launch_people_detection" default="true" />
+  <arg name="launch_teleoperation" default="false" />
+  <arg name="launch_people_detection" default="false" />
   <arg name="launch_look_forward" default="true" />
   <arg name="launch_twitter" default="true" />
   <arg name="launch_visualize_log" default="true" />
@@ -28,11 +28,11 @@
   <arg name="store_move_base_log" default="true" />
   <arg name="store_object_detection_log" default="true" />
   <arg name="store_action_result_log" default="true" />
-  <arg name="store_tf" default="true" />
-  <arg name="store_joint_states" default="true" />
-  <arg name="store_camera_rgb" default="true" />
-  <arg name="store_camera_depth" default="true" />
-  <arg name="store_people" default="true" />
+  <arg name="store_tf" default="false" />
+  <arg name="store_joint_states" default="false" />
+  <arg name="store_camera_rgb" default="false" />
+  <arg name="store_camera_depth" default="false" />
+  <arg name="store_people" default="false" />
 
   <include file="$(find jsk_pr2_startup)/jsk_pr2.machine"
            if="$(arg launch_c3_startup)" />
