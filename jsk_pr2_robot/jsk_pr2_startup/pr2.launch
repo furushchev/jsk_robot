@@ -34,6 +34,9 @@
   <arg name="store_camera_depth" default="false" />
   <arg name="store_people" default="false" />
 
+  <param name="robot/type" value="pr2" />
+  <param name="robot/name" command='bash -c "hostname | xargs echo -n"' />
+
   <include file="$(find jsk_pr2_startup)/jsk_pr2.machine"
            if="$(arg launch_c3_startup)" />
   <include file="$(find pr2_machine)/$(env ROBOT).machine"
