@@ -21,7 +21,7 @@ class CheckOpenNINode:
         self.camera = rospy.get_param('~camera', 'kinect_head')
         self.sleep_cycle = rospy.get_param('~sleep_cycle', 60)
         self.speak_enabled = rospy.get_param("~speak", True)
-        self.speak_pub = rospy.Publisher("/robotsound", SoundRequest)
+        self.speak_pub = rospy.Publisher("/robotsound", SoundRequest, queue_size=1)
         self.restart_srv = rospy.Service('~restart', Empty, self.restart_service_callback)
 
     def speak(self, speak_str):
