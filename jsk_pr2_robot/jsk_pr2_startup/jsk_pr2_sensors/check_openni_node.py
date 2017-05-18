@@ -41,8 +41,8 @@ class CheckOpenNINode:
         self.image_sub.unregister()
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-            sum_of_pixels = max(cv.sumElems(cv_image)
-        except CvBridgeError, e:
+            sum_of_pixels = max(cv.sumElems(cv_image))
+        except:
             try:
                 cv_image = self.bridge.imgmsg_to_cv(msg, "bgr8")
                 sum_of_pixels = max(cv.Sum(cv_image))
