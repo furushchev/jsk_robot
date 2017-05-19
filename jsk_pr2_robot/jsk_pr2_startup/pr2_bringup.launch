@@ -2,6 +2,7 @@
   <arg name="launch_runtime_logger" default="false" />
   <arg name="launch_hd_monitor" default="false" />
   <arg name="launch_wifi_ddwrt" default="false" />
+  <arg name="launch_network_detector" default="false" />
 
   <param name="/use_sim_time" value="false"/>
   <include file="$(find pr2_machine)/pr2.machine" />
@@ -166,7 +167,8 @@
     <param name="buffer_size" value="120.0"/>
   </node>
 
-  <node pkg="pr2_computer_monitor" type="network_detector" name="network_detector" output="screen">
+  <node pkg="pr2_computer_monitor" type="network_detector" name="network_detector"
+        if="$(arg launch_network_detector)">
     <param name="interface_name" value="wan0"/>
   </node>
 
