@@ -33,10 +33,13 @@ class FileLogger(BatteryLogger):
         index = ["HardwareID", "CycleCount", "FullCapacity", "RemainingCapacity"]
         if not os.path.exists(filename):
             # write index
-            lines.append(",".join(["Date", "Name"] + index))
+            lines.append(["Date", "Name"] + index)
 
         for name, batt in info.items():
-            values = [batt[k] for k in index]
+            values = []
+            for k in index:
+                if k in batt:
+                    values.append(str(batt[k]))
             lines.append([date.secs, name] + values)
 
         with open(filename, "a") as f:
