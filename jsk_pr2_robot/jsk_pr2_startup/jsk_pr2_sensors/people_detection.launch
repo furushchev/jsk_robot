@@ -6,7 +6,7 @@
   <arg name="leg_detect" default="true" />
   <arg name="publish_people" default="true" />
 
-  <arg name="camera" default="kinect_head_c2" />
+  <arg name="camera" default="kinect_head" />
   <arg name="image_topic" default="image_rect_color" />
   <arg name="depth_topic" default="image_raw" />
   <arg name="fixed_frame" default="kinect_head_rgb_optical_frame" />
@@ -41,7 +41,7 @@
            output="screen">
        <param name="show_screen_flag" value="false" />
        <param name="confidence_value" value="0.7" />
-       <remap from="/camera/image_raw" to="/kinect_head_c2/rgb/image_rect_color" />
+       <remap from="/camera/image_raw" to="/$(arg camera)/rgb/image_rect_color" />
      </node>
      <node name="face_recognition_starter" pkg="jsk_pr2_startup" type="face_recognition_starter.py"
            output="screen" />
