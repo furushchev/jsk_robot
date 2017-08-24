@@ -9,6 +9,7 @@ import os
 import requests
 import rospy
 from diagnostic_msgs.msg import DiagnosticArray
+import traceback
 
 
 class BatteryLogger(object):
@@ -94,7 +95,8 @@ class BatteryInfoAggregator(object):
                     logger.write(msg.header.stamp, results)
                     logger.last_update = msg.header.stamp
                 except Exception as e:
-                    rospy.logerr("Failed to write to logger %s" % type(logger).__name__)
+                    rospy.logerr("[%s] Failed to write to logger: %s", type(logger).__name__, str(e))
+                    rospy.logerr(traceback.format_exc())
 
 
 if __name__ == '__main__':
