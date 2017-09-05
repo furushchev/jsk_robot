@@ -79,13 +79,21 @@ class Warning:
         self.robot_state_msgs = msg
 
     def battery_callback(self, msg):
+        if not msg.is_charging:
+            prev_level = self.battery_state_msgs.charge_level
+            cur_level = msg.charge_level
+            for p in [0.4, 0.3, 0.2, 0.1]:
+                if prev_level > p and cur_level < p:
+                    sound.say("Battery is %d percents." % cur_level)
+                    break
+
+            if cur_level < 0.1:
+                sound.play(2)
+                time.sleep(2)
+                sound.play(5)
+                time.sleep(5)
+
         self.battery_state_msgs = msg
-        #
-        if msg.is_charging == False and msg.charge_level < 0.1:
-            sound.play(2)
-            time.sleep(2)
-            sound.play(5)
-            time.sleep(5)
 
     def cmd_vel_callback(self, msg):
         ## warn when cmd_vel is issued while the robot is charning
@@ -132,11 +140,7 @@ class Warning:
 
 if __name__ == "__main__":
     global sound
-    rospy.init_node("cable_warning")
+    rospy.init_node("warning")
     sound = SoundClient()
     w = Warning()
     rospy.spin()
-
-
-
-
