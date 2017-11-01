@@ -120,6 +120,14 @@
         <remap from="~input" to="hw_registered/image_rect" />
         <remap from="~output" to="image_rect" />
       </node>
+      <node name="relay_image_rect_compressed"
+            pkg="nodelet" type="nodelet"
+            args="load jsk_topic_tools/Relay /$(arg camera)/$(arg manager)"
+            machine="$(arg machine)"
+            respawn="true">
+        <remap from="~input" to="hw_registered/image_rect/compressedDepth" />
+        <remap from="~output" to="image_rect/compressedDepth" />
+      </node>
       <node name="throttle_camera_info"
             pkg="nodelet" type="nodelet"
             args="load jsk_topic_tools/LightweightThrottle /$(arg camera)/$(arg manager)"
@@ -135,8 +143,8 @@
             if="$(arg throttle_depth)"
             machine="$(arg machine)"
             respawn="true">
-        <remap from="~input" to="hw_registered/image_rect_raw" />
-        <remap from="~output" to="throttled/image_rect_raw" />
+        <remap from="~input" to="image_rect" />
+        <remap from="~output" to="throttled/image_rect" />
         <param name="update_rate" value="$(arg throttle_rate)" />
       </node>
       <node name="throttle_cloud"
