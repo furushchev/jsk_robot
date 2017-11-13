@@ -10,6 +10,16 @@ import requests
 import rospy
 from diagnostic_msgs.msg import DiagnosticArray
 import traceback
+import stat
+
+
+def is_file_writable(path):
+    if not os.path.exists(path):
+        return True  # if file does not exist, any file is writable there
+    st = os.stat(path)
+    return (bool(st.st_mode & stat.S_IWUSR) and
+            bool(st.st_mode & stat.S_IWGRP) and
+            bool(st.st_mode & stat.S_IWOTH))
 
 
 class BatteryLogger(object):
@@ -46,6 +56,8 @@ class FileLogger(BatteryLogger):
         with open(filename, "a") as f:
             writer = csv.writer(f, lineterminator=os.linesep)
             writer.writerows(lines)
+        if not is_file_writable(filename):
+            os.chmod(os.path.abspath(filename), 0777)
 
 class DweetLogger(BatteryLogger):
     def __init__(self, uid):
