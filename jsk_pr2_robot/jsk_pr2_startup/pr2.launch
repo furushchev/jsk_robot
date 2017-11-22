@@ -5,6 +5,7 @@
   <arg name="launch_map" default="true" />
   <arg name="launch_kinect" default="true" />
   <arg name="launch_move_base" default="true" />
+  <arg name="launch_moveit" default="false" />
   <arg name="launch_imagesift" default="false" />
   <arg name="launch_facedetection" default="false" />
   <arg name="launch_sound_play" default="true" />
@@ -160,6 +161,10 @@
   </include>
   <include if="$(arg launch_people_detection)"
            file="$(find jsk_pr2_startup)/jsk_pr2_sensors/people_detection.launch" />
+
+  <include if="$(arg launch_moveit)"
+           file="$(find jsk_pr2_startup)/jsk_pr2_moveit/start_pr2_moveit.launch" />
+
   <node pkg="jsk_robot_startup" type="finish_launch_sound.py"
         machine="c2"
         name="finish_launch_sound" />

@@ -4,7 +4,9 @@
   <arg name="USE_KINECT" default="false" />
 
   <!-- select sensor -->
-  <arg if="$(arg USE_LASER_AND_KINECT)" name="sensor_params_file" value="$(find jsk_pr2_startup)/jsk_pr2_moveit/sensors.yaml" />
+  <arg if="$(arg USE_LASER_AND_KINECT)"
+       name="sensor_params_file"
+       value="$(find jsk_pr2_startup)/jsk_pr2_moveit/sensors.yaml" />
   <arg if="$(arg USE_LASER)"
        name="sensor_params_file"
        value="$(find jsk_pr2_startup)/jsk_pr2_moveit/sensors_laser.yaml" />
