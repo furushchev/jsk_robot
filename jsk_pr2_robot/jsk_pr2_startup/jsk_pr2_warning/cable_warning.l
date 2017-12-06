@@ -70,3 +70,4 @@
 
 (ros::advertise "/robotsound_jp" sound_play::SoundRequest 5)
 (ros::spin)
+(exit)
