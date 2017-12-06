@@ -12,8 +12,7 @@
   (setq *robot-name* (ros::get-param "/active_user/robot_name"))
   )
 
-(ros::rate 0.1)
-(do-until-key
+(defun check-uptime ()
   (setq *user-name* (ros::get-param "/active_user/launch_user_name")
         *elapsed-time* (ros::get-param "/active_user/elapsed_time"))
   ;; tweet depend on up time
@@ -57,6 +56,11 @@
                 (incf pos))
               (tweet-string dt)
               ))
-          ))))
-  (ros::sleep)
-  )
+          )))))
+
+(ros::rate (/ 1.0 60.0))
+(while (ros::ok)
+  (check-uptime)
+  (ros::spin-once)
+  (ros::sleep))
+(exit)
