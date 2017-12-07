@@ -1,5 +1,5 @@
 <launch>
-  <arg name="launch_stereo_camera" default="false" />
+  <arg name="launch_stereo_camera" default="true" />
   <arg name="launch_runtime_logger" default="false" />
   <arg name="launch_hd_monitor" default="false" />
   <arg name="launch_wifi_ddwrt" default="false" />
