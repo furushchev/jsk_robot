@@ -1,8 +1,8 @@
 <launch>
   <arg name="ROBOT" default="$(env ROBOT)" />
   <arg name="map_frame" default="eng2" />
-  <arg name="visualize_log" default="true" />
-  <arg name="twitter" default="true" />
+  <arg name="visualize_log" default="false" />
+  <arg name="twitter" default="false" />
   <arg name="machine" default="c2" />
   <arg name="output" default="screen" />
 
