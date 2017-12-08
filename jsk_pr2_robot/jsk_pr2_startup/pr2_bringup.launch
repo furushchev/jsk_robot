@@ -105,7 +105,7 @@
   <include file="$(find pr2_bringup)/config/l_forearm_cam.launch" />
 
   <!-- Sound -->
-  <node pkg="sound_play" type="soundplay_node.py" machine="c1" name="sound_play"> 
+  <node pkg="sound_play" type="soundplay_node.py" machine="c1" name="sound_play" respawn="true">
     <remap from="sound_play" to="robotsound" />
   </node>
 
