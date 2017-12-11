@@ -5,6 +5,7 @@
   <arg name="deprecated_relay" default="true" doc="advertise to deprecated kinect_head_c2 ns"/>
   <arg name="camera" default="kinect_head" />
   <arg name="num_worker_threads" default="8" />
+  <arg name="monitor_driver" default="false" />
   <arg name="throttle_rgb" default="true" />
   <arg name="throttle_depth" default="true" />
   <arg name="throttle_cloud" default="true" />
@@ -209,7 +210,7 @@
   <!-- monitor kinect rgb and reset usb and respawn node on error -->
   <group if="$(arg respawn)">
     <node pkg="jsk_pr2_startup" name="check_openni_node" type="check_openni_node.py"
-          output="screen" machine="c1" if="$(arg load_driver)">
+          output="screen" machine="c1" if="$(arg monitor_driver)">
       <param name="camera" value="$(arg camera)" />
       <param name="sleep_cycle" value="60" />
       <remap from="image" to="/$(arg camera)/rgb/image_rect_color" />
