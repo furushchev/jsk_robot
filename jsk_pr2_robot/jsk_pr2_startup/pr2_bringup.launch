@@ -9,10 +9,6 @@
   <param name="/use_sim_time" value="false"/>
   <include file="$(find pr2_machine)/pr2.machine" />
 
-  <!-- robot name -->
-  <param name="robot/type" value="pr2" />
-  <param name="robot/name" command='bash -c "hostname | xargs echo -n"' />
-
   <!-- Remap diagnostics if we are pushed into a namespace. -->
   <remap from="/diagnostics" to="/$(optenv ROS_NAMESPACE /)/diagnostics" />
   <remap from="/diagnostics_agg" to="/$(optenv ROS_NAMESPACE /)/diagnostics_agg" />
@@ -180,6 +176,7 @@
   </node>
 
   <!-- logging database -->
+  <!-- NOTE: parameter robot/type and robot/name are defined at /etc/ros/robot.yaml -->
   <!-- expected mongod server runs on c2 -->
   <include file="$(find jsk_robot_startup)/lifelog/mongodb.launch">
     <arg name="use_daemon" value="true"/>
