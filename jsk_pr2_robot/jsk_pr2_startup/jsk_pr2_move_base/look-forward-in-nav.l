@@ -80,9 +80,8 @@
 (send *pr2* :angle-vector (send *ri* :state :potentio-vector))
 
 ;;
-(ros::rate 1)
 (while (ros::ok)
+  (ros::rate 1)
   (ros::sleep)
   (ros::spin-once)
   (look-at-front))
-

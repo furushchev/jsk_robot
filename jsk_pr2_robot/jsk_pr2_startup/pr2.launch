@@ -21,6 +21,7 @@
   <arg name="launch_look_forward" default="true" />
   <arg name="launch_twitter" default="true" />
   <arg name="launch_visualize_log" default="false" />
+  <arg name="launch_reset_motors" default="true" />
   <arg name="slow_camera_framerate" default="true" />
   <arg name="launch_c3_startup" default="false" />
   <arg name="USER_NAME" default="false" />
@@ -162,6 +163,9 @@
 
   <include if="$(arg launch_moveit)"
            file="$(find jsk_pr2_startup)/jsk_pr2_moveit/start_pr2_moveit.launch" />
+
+  <node if="$(arg launch_reset_motors)"
+        name="pr2_reset_motors" pkg="jsk_pr2_startup" type="pr2_reset_motors.py"/>
 
   <node pkg="jsk_robot_startup" type="finish_launch_sound.py"
         machine="c2"

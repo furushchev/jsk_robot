@@ -8,7 +8,7 @@ from std_msgs.msg import Bool
 from std_srvs.srv import Empty
 
 
-class PR2ResetMotorNode(object):
+class PR2ResetMotorsNode(object):
     def __init__(self):
         # By default, motor will be reset 3 times maximum in 5 minutes
         self.max_retry_num = rospy.get_param("~max_retry_num", 3)
@@ -40,6 +40,6 @@ class PR2ResetMotorNode(object):
 
 
 if __name__ == '__main__':
-    rospy.init_node("pr2_reset_motor")
-    n = PR2ResetMotorNode()
+    rospy.init_node("pr2_reset_motors")
+    n = PR2ResetMotorsNode()
     rospy.spin()
