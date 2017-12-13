@@ -190,12 +190,6 @@
   </include>
 
   <!-- app manager -->
-  <group if="$(arg launch_app_manager)">
-      <node pkg="app_manager" type="appmaster" name="appmaster" args="-p 11312"/>
-      <node pkg="app_manager" type="app_manager" name="app_manager"
-            args="--applist $(find local_app_manager)/mock_apps"
-            output="screen" cwd="node">
-        <param name="interface_master" value="http://localhost:11312"/>
-      </node>
-  </group>
+  <include file="$(find jsk_pr2_startup)/jsk_pr2_lifelog/app_manager.launch"
+           if="$(arg launch_app_manager)" />
 </launch>
