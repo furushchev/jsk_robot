@@ -181,9 +181,6 @@
 
   <!-- logging database -->
   <!-- expected mongod server runs on c2 -->
-  <param name="robot/type" value="pr2" />
-  <param name="robot/name" command='bash -c "hostname | xargs echo -n"' />
-
   <include file="$(find jsk_robot_startup)/lifelog/mongodb.launch">
     <arg name="use_daemon" value="true"/>
     <arg name="port" value="27017" />
