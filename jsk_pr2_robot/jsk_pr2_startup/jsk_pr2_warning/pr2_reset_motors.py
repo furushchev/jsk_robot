@@ -16,15 +16,22 @@ class PR2ResetMotorsNode(object):
 
         self.history = []
         self.run_stop = False
+        self.calibrated = False
 
         self.reset_srv = rospy.ServiceProxy("/pr2_ethercat/reset_motors", Empty)
         self.sub_runstop = rospy.Subscriber("/power_board/state", PowerBoardState, self.runstop_cb)
         self.sub_motors  = rospy.Subscriber("/pr2_ethercat/motors_halted", Bool, self.motors_cb)
+        self.sub_calib   = rospy.Subscriber("/calibrated", Bool, self.calib_cb)
+
+    def calib_cb(self, msg):
+        self.calibrated = msg.data
 
     def runstop_cb(self, msg):
         self.run_stop = msg.run_stop
 
     def motors_cb(self, msg):
+        if not self.calibrated:
+            return
         halted = msg.data
         rospy.logdebug("runstop: %s, halted: %s" % (self.run_stop, halted))
         if self.run_stop and halted:
