@@ -187,6 +187,8 @@
   </include>
 
   <!-- app manager -->
-  <include file="$(find jsk_pr2_startup)/jsk_pr2_lifelog/app_manager.launch"
-           if="$(arg launch_app_manager)" />
+  <include file="$(find jsk_robot_startup)/lifelog/app_manager.launch"
+           if="$(arg launch_app_manager)">
+    <arg name="applist" value="$(find jsk_pr2_startup)/apps"/>
+  </include>
 </launch>
