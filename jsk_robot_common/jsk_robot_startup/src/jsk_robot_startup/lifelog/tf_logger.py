@@ -21,11 +21,19 @@ class TFLogger(LoggerBase):
         rospy.wait_for_service("~tf2_frames")
         self.get_frames = rospy.ServiceProxy("~tf2_frames", FrameGraph)
 
+        self.lookup_latest = rospy.get_param("~lookup_latest", True)
+
         self.update_rate = rospy.get_param("~update_rate", 1.0)
-        self.timer = rospy.Timer(rospy.Duration(self.update_rate), self.timer_callback)
+        self.timer = rospy.Timer(
+            rospy.Duration(self.update_rate), self.timer_callback)
 
     def timer_callback(self, event):
-        time = event.last_real or event.current_real - rospy.Duration(self.update_rate)
+        if self.lookup_latest:
+            time = event.last_real or\
+                   event.current_real - rospy.Duration(self.update_rate)
+        else:
+            time = rospy.Time(0)
+
         try:
             graph = yaml.load(self.get_frames().frame_yaml)
         except Exception as e:
@@ -36,13 +44,22 @@ class TFLogger(LoggerBase):
         for child, info in graph.items():
             parent = info["parent"]
             try:
-                transforms += [self.tf_buffer.lookup_transform(parent, child, time)]
+                transforms += [
+                    self.tf_buffer.lookup_transform(parent, child, time)]
             except ExtrapolationException:
                 pass
-        if not transforms: return
+        if not transforms:
+            return
+
+        stamp = transforms[0].header.stamp
+        for t in transforms:
+            if t.header.stamp > stamp:
+                stamp = t.header.stamp
 
         try:
-            self.insert(TFMessage(transforms), meta={'input_topic': '/tf'})
+            self.insert(TFMessage(transforms),
+                        meta={'input_topic': '/tf',
+                              'transformed_at': stamp.to_nsec()})
         except Exception as e:
             rospy.logerr(e)
 
