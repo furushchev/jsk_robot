@@ -1,5 +1,5 @@
 <launch>
-  <arg name="ROBOT" default="$(optenv ROBOT pr2)"/>
+  <arg name="ROBOT" default="pr2"/>
   <include file="$(find pr2_machine)/$(arg ROBOT).machine" />
   <!--  Arm controllers for mannequin mode -->
   <rosparam command="load" file="$(find pr2_mannequin_mode)/config/pr2_arm_controllers_loose.yaml" />

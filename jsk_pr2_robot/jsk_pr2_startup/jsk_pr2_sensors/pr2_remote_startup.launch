@@ -1,5 +1,5 @@
 <launch>
-  <arg name="ROBOT" default="$(optenv ROBOT pr2)"/>
+  <arg name="ROBOT" default="pr2"/>
   <arg name="MACHINE" default="localhost"/>
   <arg name="launch_openni" default="true" />
   <arg name="launch_battery" default="false" />

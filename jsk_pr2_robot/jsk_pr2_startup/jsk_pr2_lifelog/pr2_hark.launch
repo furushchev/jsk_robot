@@ -1,14 +1,16 @@
 <launch>
-  <arg name="ROBOT" default="$(optenv ROBOT pr2)" />
+  <arg name="ROBOT" default="pr2" />
+  <arg name="use_mic_c1" default="false"/>
+  <arg name="use_mic_c2" default="false"/>
   <include file="$(find pr2_machine)/$(arg ROBOT).machine" />
   <node name="pr2_hark" pkg="jsk_pr2_startup"
         type="microcone_localization_MFCC.sh" output="log"
         machine="c1"
-        if="$(optenv USE_MIC_C1 false)"
+        if="$(arg use_mic_c1)"
         />
   <node name="pr2_hark" pkg="jsk_pr2_startup"
         type="microcone_localization_MFCC.sh" output="log"
         machine="c2"
-        if="$(optenv USE_MIC_C2 false)"
+        if="$(arg use_mic_c2)"
         />
 </launch>

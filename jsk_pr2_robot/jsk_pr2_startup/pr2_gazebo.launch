@@ -19,8 +19,8 @@
   <arg name="INITIAL_POSE_YAW" default="0.0" />
 
   <!-- set default environment variables -->
-  <arg name="KINECT1" value="$(optenv KINECT1 true)" />
-  <arg name="KINECT2" value="$(optenv KINECT2 false)" />
+  <arg name="KINECT1" value="true" />
+  <arg name="KINECT2" value="false" />
 
   <rosparam>
     robot:

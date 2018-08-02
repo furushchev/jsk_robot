@@ -1,6 +1,6 @@
 <!-- This file is originally pr2_2dnav/pr2_2dnav.launch --> 
 <launch>
-  <arg name="ROBOT" default="$(optenv ROBOT pr2)"/>
+  <arg name="ROBOT" default="pr2"/>
   <arg name="gazebo" default="false" />
   <arg name="launch_look_forward" default="true"/>
   <arg name="launch_teleop_joystick" default="true" />
